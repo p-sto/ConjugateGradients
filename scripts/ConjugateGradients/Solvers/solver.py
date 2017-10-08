@@ -24,10 +24,16 @@ class IterativeSolver(metaclass=ABCMeta):
         self.x_vec = x_vec
         self.max_iter = max_iter
         self.residual_values = []   # type: list
+        if not self._is_pos_def:
+            raise TypeError('Provided matrix is not positively defined.')
 
     def _register_residual(self, res_val: float) -> None:
         """Register residual value for particular iteration."""
         self.residual_values.append(res_val)
+
+    def _is_pos_def(self) -> bool:
+        """Check if matrix is positively defined using eigenvalues."""
+        return np.all(np.linalg.eigvals(self.a_matrix) > 0)
 
     @abstractmethod
     def solve(self) -> Tuple[np.matrix, int]:

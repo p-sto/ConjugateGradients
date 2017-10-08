@@ -26,12 +26,12 @@ class ConjugateGradientMethodSolver(IterativeSolver, Convergence):
         while i < self.max_iter and np.linalg.norm(residual) > self.tolerance:
             q_vec = self.a_matrix * div
             alpha = float(delta_new/(div.T*q_vec))
-            x_vec += alpha*div
-            residual -= alpha*q_vec
+            # numpy has some problems with casting when using += notation...
+            x_vec = x_vec + alpha*div
+            residual = residual - alpha*q_vec
             delta_old = delta_new
             delta_new = residual.T*residual
             beta = delta_new/delta_old
             div = residual + float(beta)*div
-            self._register_residual(residual)
             i += 1
         return x_vec, i
