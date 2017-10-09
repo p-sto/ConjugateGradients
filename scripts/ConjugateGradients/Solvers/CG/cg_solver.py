@@ -12,7 +12,7 @@ from Solvers.solver import IterativeSolver
 import numpy as np
 
 
-class ConjugateGradientMethodSolver(IterativeSolver, Convergence):
+class ConjugateGradientSolver(IterativeSolver, Convergence):
     """Implements Conjugate Gradient method to solve system of linear equations."""
 
     def solve(self) -> Tuple[np.matrix, int]:

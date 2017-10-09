@@ -1,7 +1,8 @@
 """Miscellaneous functions"""
 
 from typing import Optional
-from Solvers.CG.cg_solver import ConjugateGradientMethodSolver
+from Solvers.CG.cg_solver import ConjugateGradientSolver
+from Solvers.PCG.pcg_solver import PreConditionedConjugateGradientSolver
 from Solvers.solver import IterativeSolver
 
 import numpy as np
@@ -10,7 +11,9 @@ import numpy as np
 def get_solver(name: str) -> Optional[IterativeSolver]:
     """Return solver based on name."""
     if name == 'CG':
-        return ConjugateGradientMethodSolver
+        return ConjugateGradientSolver
+    if name == 'PCG':
+        return PreConditionedConjugateGradientSolver
     raise NotImplementedError('Provided name for solver is wrong.')
 
 
