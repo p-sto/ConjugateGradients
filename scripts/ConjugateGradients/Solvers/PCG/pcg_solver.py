@@ -6,9 +6,9 @@ https://www.cs.cmu.edu/~quake-papers/painless-conjugate-gradient.pdf
 
 import copy
 from typing import Tuple
-from Solvers.PCG.preconditioners import jacobi
-from Solvers.mixins import Convergence
-from Solvers.solver import IterativeSolver
+from scripts.ConjugateGradients.Solvers.PCG.preconditioners import jacobi
+from scripts.ConjugateGradients.Solvers.mixins import Convergence
+from scripts.ConjugateGradients.Solvers.common import IterativeSolver
 
 import numpy as np
 

@@ -1,8 +1,8 @@
 # basic:
 PROJECT_NAME=ConjugateGradients
-PWD:=$(shell pwd)
+PWD:=$(shell pwd)/../
 PYTHONPATH=$(PWD)
-TEST_DIR=tests
+TEST_DIR=tests/
 VENV=venv/bin
 PIP=$(VENV)/pip3
 PIP_FLAGS=--trusted-host=http://pypi.python.org/simple/
@@ -27,7 +27,7 @@ venv/bin/activate: requirements.txt
 	touch venv/bin/activate
 
 test_pytest:
-	$(PYTEST) --verbose --color=yes --cov=$(PROJECT_NAME) --cov-report html --cov-config .coveragerc --tb=short $(TEST_DIR)
+	PYTHONPATH=$(PYTHONPATH) $(PYTEST) --verbose --color=yes --cov=$(PROJECT_NAME) --cov-report html --cov-config .coveragerc --tb=short $(TEST_DIR)
 
 test_pylint:
 	find $(PROJECT_NAME) -name '*.py' | xargs $(PYLINT) --rcfile=$(PWD)/.pylintrc
