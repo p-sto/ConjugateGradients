@@ -13,11 +13,13 @@ def main():
     a_matrix = get_test_matrix_three_diagonal(matrix_size)
     x_vec = np.vstack([1 for x in range(matrix_size)])
     b_vec = np.vstack([uniform(0, 1) for x in range(matrix_size)])
-    Solver = get_solver('PCG')      # pylint: disable=invalid-name; get_solver returns Class
+    Solver = get_solver('CG')      # pylint: disable=invalid-name; get_solver returns Class
     solver = Solver(a_matrix, b_vec, x_vec)
     x_vec, i = solver.solve()
 
     print('Solved in {} iterations'.format(i))
+
+    solver.show_convergence_profile()
 
 
 if __name__ == '__main__':

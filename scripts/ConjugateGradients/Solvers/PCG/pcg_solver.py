@@ -40,5 +40,6 @@ class PreConditionedConjugateGradientSolver(IterativeSolver, Convergence):
             delta_new = residual.T*s_pre
             beta = delta_new/delta_old
             div = s_pre + float(beta)*div
+            self._register_residual(residual)
             i += 1
         return x_vec, i

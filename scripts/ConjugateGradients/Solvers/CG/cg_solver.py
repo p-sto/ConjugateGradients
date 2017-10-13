@@ -33,5 +33,6 @@ class ConjugateGradientSolver(IterativeSolver, Convergence):
             delta_new = residual.T*residual
             beta = delta_new/delta_old
             div = residual + float(beta)*div
+            self._register_residual(residual)
             i += 1
         return x_vec, i

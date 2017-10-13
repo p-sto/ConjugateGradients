@@ -1,8 +1,9 @@
 """Stores implementation of IterativeSolver abstract class."""
 
 from abc import ABCMeta, abstractmethod
-from typing import Tuple
+from typing import Tuple, List
 
+import matplotlib.pyplot as plt
 import numpy as np
 
 
@@ -27,13 +28,28 @@ class IterativeSolver(metaclass=ABCMeta):
         if not self._is_pos_def:
             raise TypeError('Provided matrix is not positively defined.')
 
-    def _register_residual(self, res_val: float) -> None:
+    def _register_residual(self, conv: np.matrix) -> None:
         """Register residual value for particular iteration."""
-        self.residual_values.append(res_val)
+        self.residual_values.append(np.linalg.norm(conv))
 
     def _is_pos_def(self) -> bool:
         """Check if matrix is positively defined using eigenvalues."""
         return np.all(np.linalg.eigvals(self.a_matrix) > 0)
+
+    def get_convergence_profile(self) -> List:
+        """Return convergence profile."""
+        return self.residual_values
+
+    def show_convergence_profile(self) -> None:
+        """Show plot with convergence profile - normalised residual vector vs iteration."""
+        y_es = self.get_convergence_profile()
+        x_es = [i for i in range(len(y_es))]
+        plt.plot(x_es, y_es, 'bo')
+        plt.show()
+
+    def compare_convergence_profiles(self, *args: List[IterativeSolver]) -> None:
+        """Show plot with multiple convergence profiles."""
+        pass
 
     @abstractmethod
     def solve(self) -> Tuple[np.matrix, int]:
