@@ -6,22 +6,22 @@ https://www.cs.cmu.edu/~quake-papers/painless-conjugate-gradient.pdf
 
 import copy
 from typing import Tuple
-from scripts.ConjugateGradients.Solvers.PCG.preconditioners import jacobi
-from scripts.ConjugateGradients.Solvers.mixins import Convergence
+from scripts.ConjugateGradients.Solvers.PCG.preconditioners import jacobi, get_preconditioner
 from scripts.ConjugateGradients.Solvers.common import IterativeSolver
 
 import numpy as np
 
 
-class PreConditionedConjugateGradientSolver(IterativeSolver, Convergence):
+class PreConditionedConjugateGradientSolver(IterativeSolver):
     """Implements Preconditioned Conjugate Gradient method to solve system of linear equations."""
 
-    def __init__(self, *args, preconditioner=jacobi, **kwargs) -> None:
+    def __init__(self, *args, preconditioner: str = None, **kwargs) -> None:
         """Initialize PCG solver object, sets default pre-conditioner."""
         super(PreConditionedConjugateGradientSolver, self).__init__(*args, **kwargs)
-        self.preconditioner = preconditioner
+        self.preconditioner = jacobi if not preconditioner else get_preconditioner(preconditioner)
+        self.name = 'PCG (' + self.preconditioner.__name__ + ')'
 
-    def solve(self) -> Tuple[np.matrix, int]:
+    def solve(self) -> Tuple[np.matrix, np.matrix, int]:
         """Solve system of linear equations."""
         i = 0
         x_vec = copy.deepcopy(self.x_vec)
@@ -42,4 +42,4 @@ class PreConditionedConjugateGradientSolver(IterativeSolver, Convergence):
             div = s_pre + float(beta)*div
             self._register_residual(residual)
             i += 1
-        return x_vec, i
+        return x_vec, residual, i

@@ -1,6 +1,14 @@
 """Contains implementations of pre-conditioners for PCG method."""
 
+from typing import Callable
 import numpy as np
+
+
+def get_preconditioner(name: str) -> Callable:
+    """Return pre-conditioner based on name."""
+    if name == 'jacobi':
+        return jacobi
+    raise KeyError('No pre-conditioner for provided name = {}'.format(name))
 
 
 def jacobi(a_matrix: np.matrix, residual: np.matrix) -> np.matrix:

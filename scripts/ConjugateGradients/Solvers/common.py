@@ -20,6 +20,7 @@ class IterativeSolver(metaclass=ABCMeta):
         :param max_iter:
 
         """
+        self.name = ''
         self.a_matrix = a_matrix
         self.b_vec = b_vec
         self.x_vec = x_vec
@@ -44,12 +45,29 @@ class IterativeSolver(metaclass=ABCMeta):
         """Show plot with convergence profile - normalised residual vector vs iteration."""
         y_es = self.get_convergence_profile()
         x_es = [i for i in range(len(y_es))]
-        plt.plot(x_es, y_es, 'bo')
+        plt.plot(x_es, y_es, 'b--')
         plt.show()
 
-    def compare_convergence_profiles(self, *args: List[IterativeSolver]) -> None:
+    @staticmethod
+    def compare_convergence_profiles(*args: 'IterativeSolver') -> None:
         """Show plot with multiple convergence profiles."""
-        pass
+        _to_print = []
+        _legend = []
+        plot_lines = ['--', '*', '*', '^']
+        plot_colors = ['b', 'r', 'g', 'y']
+        for ind, solver in enumerate(args):
+            _y = solver.get_convergence_profile()
+            _x = [i for i in range(len(_y))]
+            try:
+                line_color = plot_colors[ind] + plot_lines[ind]
+            except IndexError:
+                line_color = ''
+            _to_print.append((_x, _y, line_color))
+            _legend.append(solver.name)
+        plt.plot(*[item for sublist in _to_print for item in sublist])
+        plt.legend(_legend)
+        plt.show()
+
 
     @abstractmethod
     def solve(self) -> Tuple[np.matrix, int]:

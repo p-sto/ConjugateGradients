@@ -7,7 +7,7 @@ from scripts.ConjugateGradients.Solvers.common import IterativeSolver
 import numpy as np
 
 
-def get_solver(name: str=None) -> IterativeSolver:
+def get_solver(name: str = None) -> IterativeSolver:
     """Return solver based on name."""
     if not name or name == 'CG':
         return ConjugateGradientSolver

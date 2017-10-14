@@ -6,16 +6,20 @@ https://www.cs.cmu.edu/~quake-papers/painless-conjugate-gradient.pdf
 
 import copy
 from typing import Tuple
-from scripts.ConjugateGradients.Solvers.mixins import Convergence
 from scripts.ConjugateGradients.Solvers.common import IterativeSolver
 
 import numpy as np
 
 
-class ConjugateGradientSolver(IterativeSolver, Convergence):
+class ConjugateGradientSolver(IterativeSolver):
     """Implements Conjugate Gradient method to solve system of linear equations."""
 
-    def solve(self) -> Tuple[np.matrix, int]:
+    def __init__(self, *args, **kwargs):
+        """Initialize CG solver object."""
+        super(ConjugateGradientSolver, self).__init__(*args, **kwargs)
+        self.name = 'CG'
+
+    def solve(self) -> Tuple[np.matrix, np.matrix, int]:
         """Solve system of linear equations."""
         i = 0
         x_vec = copy.deepcopy(self.x_vec)
@@ -35,4 +39,4 @@ class ConjugateGradientSolver(IterativeSolver, Convergence):
             div = residual + float(beta)*div
             self._register_residual(residual)
             i += 1
-        return x_vec, i
+        return x_vec, residual, i

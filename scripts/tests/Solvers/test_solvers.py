@@ -19,13 +19,13 @@ def test_cg(test_matrix):
     a_matrix, x_vec, b_vec = test_matrix
     Solver = get_solver()
     solver = Solver(a_matrix, x_vec, b_vec)
-    x_vec, i = solver.solve()
-    assert 0.99999 < np.linalg.norm(x_vec) < 1.0001
+    results = solver.solve()
+    assert 0.99999 < np.linalg.norm(results[0]) < 1.0001
 
 
-def test_pcg(test_matrix):
+def test_pcg_jacobi(test_matrix):
     a_matrix, x_vec, b_vec = test_matrix
     Solver = get_solver('PCG')
     solver = Solver(a_matrix, x_vec, b_vec)
-    x_vec, i = solver.solve()
-    assert 0.99999 < np.linalg.norm(x_vec) < 1.0001
+    results = solver.solve()
+    assert 0.99999 < np.linalg.norm(results[0]) < 1.0001

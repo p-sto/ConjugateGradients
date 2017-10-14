@@ -1,7 +1,7 @@
 # basic:
 PROJECT_NAME=ConjugateGradients
-PWD:=$(shell pwd)/../
-PYTHONPATH=$(PWD)
+PWD:=$(shell pwd)
+PYTHONPATH=$(PWD)/../
 TEST_DIR=tests/
 VENV=venv/bin
 PIP=$(VENV)/pip3
