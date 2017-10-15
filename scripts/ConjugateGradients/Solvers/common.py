@@ -25,6 +25,7 @@ class IterativeSolver(metaclass=ABCMeta):
         self.b_vec = b_vec
         self.x_vec = x_vec
         self.max_iter = max_iter
+        self.finished_iter = None
         self.residual_values = []   # type: list
         if not self._is_pos_def:
             raise TypeError('Provided matrix is not positively defined.')
@@ -45,7 +46,11 @@ class IterativeSolver(metaclass=ABCMeta):
         """Show plot with convergence profile - normalised residual vector vs iteration."""
         y_es = self.get_convergence_profile()
         x_es = [i for i in range(len(y_es))]
+        plt.title(self.name + ' method convergence profile')
+        plt.ylabel('Convergence (residual norm)')
+        plt.xlabel('Iterations')
         plt.plot(x_es, y_es, 'b--')
+        plt.legend(['Total iter = ' + str(self.finished_iter)])
         plt.show()
 
     @staticmethod
@@ -63,7 +68,10 @@ class IterativeSolver(metaclass=ABCMeta):
             except IndexError:
                 line_color = ''
             _to_print.append((_x, _y, line_color))
-            _legend.append(solver.name)
+            _legend.append(solver.name + ' : iters =' + str(solver.finished_iter))
+        plt.title('Convergence profiles comparison')
+        plt.ylabel('Convergence (residual norm)')
+        plt.xlabel('Iterations')
         plt.plot(*[item for sublist in _to_print for item in sublist])
         plt.legend(_legend)
         plt.show()

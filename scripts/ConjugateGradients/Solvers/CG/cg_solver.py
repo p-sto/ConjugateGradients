@@ -19,7 +19,7 @@ class ConjugateGradientSolver(IterativeSolver):
         super(ConjugateGradientSolver, self).__init__(*args, **kwargs)
         self.name = 'CG'
 
-    def solve(self) -> Tuple[np.matrix, np.matrix, int]:
+    def solve(self) -> Tuple[np.matrix, np.matrix]:
         """Solve system of linear equations."""
         i = 0
         x_vec = copy.deepcopy(self.x_vec)
@@ -39,4 +39,5 @@ class ConjugateGradientSolver(IterativeSolver):
             div = residual + float(beta)*div
             self._register_residual(residual)
             i += 1
-        return x_vec, residual, i
+        self.finished_iter = i
+        return x_vec, residual

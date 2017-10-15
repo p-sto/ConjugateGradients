@@ -1,0 +1,19 @@
+[run]
+branch = True
+
+source = StockScraper
+
+[report]
+exclude_lines =
+      if __name__ == .__main__.:
+      raise NotImplementedError
+      pass
+      logging.*
+ignore_errors = False
+
+omit =
+      docs/*
+      tests/*
+      ConjugateGradients/__init__.py
+      ConjugateGradients/demo.py
+show_missing = True
