@@ -1,7 +1,8 @@
 """Reference script for implementation of Conjugate Gradient method."""
 
 from random import uniform
-from scripts.ConjugateGradients.utils import get_test_random_matrix_multi_diagonal, get_solver
+from scripts.ConjugateGradients.test_matrices import TestMatrices
+from scripts.ConjugateGradients.utils import get_solver
 
 import numpy as np
 
@@ -10,7 +11,7 @@ def main():
     """This is ``main`` script function - implemented only to test algorithm."""
 
     matrix_size = 100
-    a_matrix = get_test_random_matrix_multi_diagonal(matrix_size)
+    a_matrix = TestMatrices.get_random_test_matrix(matrix_size)
     x_vec = np.vstack([1 for x in range(matrix_size)])
     b_vec = np.vstack([uniform(0, 1) for x in range(matrix_size)])
     CGSolver = get_solver('CG')             # pylint: disable=invalid-name; get_solver returns Class

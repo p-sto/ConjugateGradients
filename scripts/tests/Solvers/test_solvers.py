@@ -1,7 +1,8 @@
 """Tests for ConjugateGradients solvers."""
 
 import pytest
-from scripts.ConjugateGradients.utils import get_test_matrix_diagonal, get_solver
+from scripts.ConjugateGradients.utils import get_solver
+from scripts.ConjugateGradients.test_matrices import TestMatrices
 
 import numpy as np
 
@@ -9,7 +10,7 @@ import numpy as np
 @pytest.fixture
 def test_matrix():
     matrix_size = 100
-    a_matrix = get_test_matrix_diagonal(matrix_size)
+    a_matrix = TestMatrices.get_diagonal_matrix(matrix_size) * 10
     x_vec = np.vstack([1 for x in range(matrix_size)])
     b_vec = np.vstack([0 for x in range(matrix_size)])
     return a_matrix, x_vec, b_vec

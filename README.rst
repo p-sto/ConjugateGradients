@@ -34,16 +34,27 @@ Usage
 
 .. code:: python
 
-    from scripts.ConjugateGradients.utils import get_test_matrix_three_diagonal, get_solver
+    from random import uniform
+    from scripts.ConjugateGradients.test_matrices import TestMatrices
+    from scripts.ConjugateGradients.utils import get_solver
+
     import numpy as np
 
     matrix_size = 100
-    a_matrix = get_test_matrix_three_diagonal(matrix_size)
+    a_matrix = TestMatrices.get_random_test_matrix(matrix_size)
     x_vec = np.vstack([1 for x in range(matrix_size)])
     b_vec = np.vstack([uniform(0, 1) for x in range(matrix_size)])
-    CGSolver = get_solver('CG')
+    CGSolver = get_solver('CG')             # pylint: disable=invalid-name; get_solver returns Class
+    PCGJacobiSolver = get_solver('PCG')     # pylint: disable=invalid-name; get_solver returns Class
     cg_solver = CGSolver(a_matrix, b_vec, x_vec)
-    x_vec, residual_vec = cg_solver.solve()
+    cg_solver.solve()
+    cg_solver.show_convergence_profile()
+
+    pcg_solver = PCGJacobiSolver(a_matrix, b_vec, x_vec)
+    pcg_solver.solve()
+
+    CGSolver.compare_convergence_profiles(cg_solver, pcg_solver)
+
 
 You can view convergence profile using solver's ``show_convergence_profile`` method:
 
@@ -55,6 +66,13 @@ You can view convergence profile using solver's ``show_convergence_profile`` met
 You can compare convergence profiles of difference solvers using ``compare_convergence_profiles`` method:
 
     .. image:: doc/comparison.png
+        :height: 200 px
+        :width: 200 px
+        :scale: 50 %
+
+Matrices can be viewed using ``view_matrix`` function, which can be found in ``utils.py``
+
+    .. image:: doc/example_matrix.png
         :height: 200 px
         :width: 200 px
         :scale: 50 %

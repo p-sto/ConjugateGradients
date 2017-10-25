@@ -58,7 +58,7 @@ class IterativeSolver(metaclass=ABCMeta):
         """Show plot with multiple convergence profiles."""
         _to_print = []
         _legend = []
-        plot_lines = ['--', '*', '*', '^']
+        plot_lines = ['-', '--', '*', '^']
         plot_colors = ['b', 'r', 'g', 'y']
         for ind, solver in enumerate(args):
             _y = solver.get_convergence_profile()
@@ -68,14 +68,13 @@ class IterativeSolver(metaclass=ABCMeta):
             except IndexError:
                 line_color = ''
             _to_print.append((_x, _y, line_color))
-            _legend.append(solver.name + ' : iters =' + str(solver.finished_iter))
+            _legend.append('{} iters = {}'.format(solver.name, solver.finished_iter))
         plt.title('Convergence profiles comparison')
         plt.ylabel('Convergence (residual norm)')
         plt.xlabel('Iterations')
         plt.plot(*[item for sublist in _to_print for item in sublist])
         plt.legend(_legend)
         plt.show()
-
 
     @abstractmethod
     def solve(self) -> Tuple[np.matrix, int]:
