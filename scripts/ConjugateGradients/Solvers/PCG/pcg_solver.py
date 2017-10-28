@@ -42,5 +42,5 @@ class PreConditionedConjugateGradientSolver(IterativeSolver):
             div = s_pre + float(beta)*div
             self._register_residual(residual)
             i += 1
-        self.finished_iter = i
+        self._finished_iter = i     # pylint: disable=attribute-defined-outside-init
         return x_vec, residual

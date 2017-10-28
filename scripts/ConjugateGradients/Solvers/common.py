@@ -21,14 +21,19 @@ class IterativeSolver(metaclass=ABCMeta):
 
         """
         self.name = ''
+        if not self._is_pos_def:
+            raise TypeError('Provided matrix is not positively defined.')
         self.a_matrix = a_matrix
         self.b_vec = b_vec
         self.x_vec = x_vec
         self.max_iter = max_iter
-        self.finished_iter = None
+        self._finished_iter = 0
         self.residual_values = []   # type: list
-        if not self._is_pos_def:
-            raise TypeError('Provided matrix is not positively defined.')
+
+    @property
+    def finished_iter(self) -> int:
+        """Return number of solver's iterations"""
+        return self._finished_iter
 
     def _register_residual(self, conv: np.matrix) -> None:
         """Register residual value for particular iteration."""
@@ -68,7 +73,7 @@ class IterativeSolver(metaclass=ABCMeta):
             except IndexError:
                 line_color = ''
             _to_print.append((_x, _y, line_color))
-            _legend.append('{} iters = {}'.format(solver.name, solver.finished_iter))
+            _legend.append('{} iter = {}'.format(solver.name, solver.finished_iter))
         plt.title('Convergence profiles comparison')
         plt.ylabel('Convergence (residual norm)')
         plt.xlabel('Iterations')
