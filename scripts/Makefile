@@ -38,7 +38,7 @@ test_gen_coverage_rep:
 test_mypy:
 	find $(PROJECT_NAME) -name '*.py' | xargs $(MYPY) $(MYPYFLAGS)
 
-test: test_pylint test_mypy test_pytest test_gen_coverage_rep
+test: test_pylint test_mypy test_pytest test_gen_coverage_rep clean
 
 
 clean:

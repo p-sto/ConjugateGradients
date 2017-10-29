@@ -1,12 +1,46 @@
 """Miscellaneous functions"""
+from typing import List, Tuple
 
 from scripts.ConjugateGradients.Solvers.CG.cg_solver import ConjugateGradientSolver
 from scripts.ConjugateGradients.Solvers.PCG.pcg_solver import PreConditionedConjugateGradientSolver
 from scripts.ConjugateGradients.Solvers.common import IterativeSolver
 
 import numpy as np
+from scipy.sparse.csr import csr_matrix
 import matplotlib
 import matplotlib.pyplot as plt
+
+
+class CSRMatrix:
+    """Wrap over standard csr_matrix scipy object for easier data manipulation."""
+
+    def __init__(self, m_matrix: np.matrix) -> None:
+        self._m_matrix = csr_matrix(m_matrix)
+
+    @property
+    def shape(self) -> Tuple[int, int]:
+        """Return tuple with shape."""
+        return self._m_matrix.shape
+
+    @property
+    def rows_i(self) -> List:
+        """Return list containing matrix rows indexes."""
+        return list(self._m_matrix.nonzero()[0])
+
+    @property
+    def column_j(self) -> List:
+        """Return list containing matrix columns indexes."""
+        return list(self._m_matrix.nonzero()[1])
+
+    @property
+    def values(self) -> List:
+        """Return list containing matrix values."""
+        return list(self._m_matrix.data)
+
+    @property
+    def nnz(self) -> int:
+        """Return number of non-zero elements."""
+        return self._m_matrix.nnz
 
 
 def get_solver(name: str = None) -> IterativeSolver:
@@ -27,3 +61,18 @@ def view_matrix(mat: np.matrix) -> None:
     plt.colorbar()
     plt.title('Matrix')
     plt.show()
+
+
+def save_csr_matrix_to_file(matrix: np.matrix, filename: str):
+    """Save CSR matrix to txt file"""
+    _matrix = CSRMatrix(matrix)
+    if _matrix.shape[0] != _matrix.shape[1]:
+        raise TypeError('Sorry - only size x size matrices!')
+    with open(filename, 'w+') as fil:
+        # save line with number of elements, matrix size and rows number
+        fil.write('{} {} {}\n'.format(len(_matrix.values), _matrix.shape[0], len(_matrix.rows_i)))
+        for ind, elmn in enumerate(_matrix.rows_i):
+            if ind < _matrix.nnz:
+                fil.write('{} {} {}\n'.format(_matrix.values[ind], _matrix.column_j[ind], elmn))
+            else:
+                fil.write('{} {}\n'.format(_matrix.values[ind], _matrix.column_j[ind]))

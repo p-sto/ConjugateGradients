@@ -19,7 +19,7 @@ class PreConditionedConjugateGradientSolver(IterativeSolver):
         """Initialize PCG solver object, sets default pre-conditioner."""
         super(PreConditionedConjugateGradientSolver, self).__init__(*args, **kwargs)
         self.preconditioner = jacobi if not preconditioner else get_preconditioner(preconditioner)
-        self.name = 'PCG (' + self.preconditioner.__name__ + ')'
+        self.name = 'PCG {}'.format(self.preconditioner.__name__)
 
     def solve(self) -> Tuple[np.matrix, np.matrix]:
         """Solve system of linear equations."""
