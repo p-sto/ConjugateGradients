@@ -1,5 +1,7 @@
 """Test matrices"""
-from numpy.ma import ceil
+import random
+
+from numpy.ma import ceil, sqrt
 from numpy.ma import floor
 
 import numpy as np
@@ -34,7 +36,32 @@ class TestMatrices:
         return csr_matrix(cls.get_matrix_three_diagonal(size=size))
 
     @staticmethod
-    def _get_quadratic_mask(size: int = 50):
+    def _brachistochrone_mask(size: int):
+        """TBI"""
+        mask = np.zeros((size, size))
+        return mask
+
+    @staticmethod
+    def _get_arrow_mask(size: int, density: float = 0.2):
+        """Return arrow-like mask for random matrix"""
+        mask = np.zeros((size, size))
+        for ind in range(size):
+            mask[ind, ind] = 1
+        for ind in np.random.choice(size-1, int(floor(size * density))):        # pylint: disable=no-member
+            length = random.randint(1, int(sqrt(ind)) + 1)
+            mask[ind-length:ind, ind] = 1
+            mask[ind, ind-length:ind] = 1
+            how_many_elmns = random.randint(1, int(sqrt(ind)) + 1)
+            for var in range(1, how_many_elmns):                                # pylint: disable=unused-variable
+                length = random.randint(1, int(sqrt(size * density)))
+                rnd_from = random.randint(1, ind) - length
+                rnd_to = rnd_from + length
+                mask[rnd_from:rnd_to, ind] = 1
+                mask[ind, rnd_from:rnd_to] = 1
+        return mask
+
+    @staticmethod
+    def _get_quadratic_mask(size: int):
         """Return mask for quadratic test matrix."""
         mask = np.zeros((size, size))
         offset = int(floor(size/100))   # add extra diagonal for each 100elements grown size
@@ -75,6 +102,8 @@ class TestMatrices:
         q_matrix = q_matrix / np.log(q_matrix.size)     # pylint: disable=no-member
         if distribution == 'quadratic':
             return np.multiply(q_matrix, cls._get_quadratic_mask(size))
+        elif distribution == 'arrow':
+            return np.multiply(q_matrix, cls._get_arrow_mask(size))
         else:
             raise NotImplementedError
 
