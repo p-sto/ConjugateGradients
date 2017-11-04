@@ -11,7 +11,9 @@ def main():
     """This is ``main`` script function - implemented only to test algorithm."""
 
     matrix_size = 100
-    a_matrix = TestMatrices.get_random_test_matrix(matrix_size)
+    # patterns are: quadratic, rectangular, arrow, noise, curve
+    # pattern='qra' means that testing matrix will be composition of all mentioned patterns
+    a_matrix = TestMatrices.get_random_test_matrix(matrix_size, pattern='q')
     x_vec = np.vstack([1 for x in range(matrix_size)])
     b_vec = np.vstack([uniform(0, 1) for x in range(matrix_size)])
     CGSolver = get_solver('CG')             # pylint: disable=invalid-name; get_solver returns Class

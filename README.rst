@@ -41,6 +41,8 @@ Usage
     import numpy as np
 
     matrix_size = 100
+    # patterns are: quadratic, rectangular, arrow, noise, curve
+    # pattern='qra' means that testing matrix will be composition of all mentioned patterns
     a_matrix = TestMatrices.get_random_test_matrix(matrix_size)
     x_vec = np.vstack([1 for x in range(matrix_size)])
     b_vec = np.vstack([uniform(0, 1) for x in range(matrix_size)])
@@ -70,9 +72,21 @@ You can compare convergence profiles of difference solvers using ``compare_conve
         :width: 200 px
         :scale: 50 %
 
-Matrices can be viewed using ``view_matrix`` function, which can be found in ``utils.py``
+Different testing matrices can be generated using ``TestMatrix`` class, for more information please refer methods descriptions.
+Matrices can be viewed using ``view_matrix`` function, which can be found in ``utils.py``. Below matrices are symmetric
+and positively defined.
 
-    .. image:: doc/example_matrix.png
+    .. image:: doc/arn_matrix.png
+        :height: 200 px
+        :width: 200 px
+        :scale: 50 %
+
+    .. image:: doc/crn_matrix.png
+        :height: 200 px
+        :width: 200 px
+        :scale: 50 %
+
+    .. image:: doc/rnqa_matrix.png
         :height: 200 px
         :width: 200 px
         :scale: 50 %
