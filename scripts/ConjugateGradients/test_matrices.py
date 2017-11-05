@@ -19,7 +19,7 @@ class TestMatrices:
         return np.matrix(diagonal)
 
     @classmethod
-    def get_diagonal_matrix_csr(cls, size: int = 50) -> np.matrix:
+    def get_diagonal_matrix_csr(cls, size: int = 50) -> csr_matrix:
         """Return diagonal matrix in CSR format."""
         return csr_matrix(cls.get_diagonal_matrix(size=size))
 
@@ -32,7 +32,7 @@ class TestMatrices:
         return np.matrix(lower_diagonal + diagonal + upper_diagonal)
 
     @classmethod
-    def get_matrix_three_diagonal_csr(cls, size: int = 50) -> np.matrix:
+    def get_matrix_three_diagonal_csr(cls, size: int = 50) -> csr_matrix:
         """Return three diagonal test matrix in csr format."""
         return csr_matrix(cls.get_matrix_three_diagonal(size=size))
 
@@ -183,7 +183,7 @@ class TestMatrices:
         :returns: generated matrix
         """
         rand_matrix = np.matrix(np.random.rand(size, size))    # pylint: disable=no-member
-        # lets make it diagonally dominant:
+        # consider making it diagonally dominant
         d_matrix = np.diagflat([1] * size)
         q_matrix = rand_matrix.T * d_matrix * rand_matrix
         # log used to reduce growth of values when size gets greater
@@ -204,6 +204,6 @@ class TestMatrices:
             raise NotImplementedError
 
     @classmethod
-    def get_random_test_matrix_csr(cls, size: int = 50, pattern: str = 'q') -> np.matrix:
+    def get_random_test_matrix_csr(cls, size: int = 50, pattern: str = 'q') -> csr_matrix:
         """Return random test matrix in csr format."""
         return csr_matrix(cls.get_random_test_matrix(size=size, pattern=pattern))

@@ -1,9 +1,8 @@
 """Miscellaneous functions"""
-from typing import List, Tuple
+from typing import List, Tuple, Callable
 
 from scripts.ConjugateGradients.Solvers.CG.cg_solver import ConjugateGradientSolver
 from scripts.ConjugateGradients.Solvers.PCG.pcg_solver import PreConditionedConjugateGradientSolver
-from scripts.ConjugateGradients.Solvers.common import IterativeSolver
 
 import numpy as np
 from scipy.sparse.csr import csr_matrix
@@ -43,7 +42,7 @@ class CSRMatrix:
         return self._m_matrix.nnz
 
 
-def get_solver(name: str = None) -> IterativeSolver:
+def get_solver(name: str = None) -> Callable:
     """Return solver based on name."""
     if not name or name == 'CG':
         return ConjugateGradientSolver
