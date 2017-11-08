@@ -5,6 +5,27 @@ Implementation of Conjugate Gradient method for solving systems of linear equati
 Currently only Python implementation is available - it includes Conjugate Gradient Method and Preconditioned Conjugate Gradient with Jacobi
 pre-conditioner (hopefully others will be added as well).
 
+Road-map:
+
+::
+
+ - [X] Python implementation
+        - [X] Create test matrices generator
+        - [X] Implement pure CG
+        - [ ] Implement PCG
+                - [X] Jacobi preconditioner
+                - [ ] SSOR preconditioner
+                - [ ] Incomplete Cholesky factorization preconditioner
+
+ -  [ ] C implementation
+        - [ ] Reference implementation using BLAS library (either ACML or OpenBLAS)
+        - [ ] Custom BLAS implementation using OpenMP
+
+ - [ ] CUDA implementation
+        - [ ] Reference implementation using CUBLAS
+        - [ ] Custom kernels implementation
+
+
 Getting Started
 ---------------
 
