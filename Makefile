@@ -1,25 +1,27 @@
-TARGET = prog
-LIBS = -lm
-CC = gcc
-CFLAGS = -g -Wall -std=c11 -O2
+CC := gcc   # clang --analyze
+CFLAGS = -Wall -Werror -Wmissing-prototypes -std=c11 -O2
 
-.PHONY: default all clean
+TARGET = ConjugateGradient
 
-default: $(TARGET)
-all: default
+SRCEXT := c
+SRCDIR := src
+BUILDDIR := build
 
-OBJECTS = $(patsubst src/%c.o, $(wildcard src/*.c))
-HEADERS = $(wildcard src/*.h)
-
-%.o: %.c $(HEADERS)
-	$(CC) $(CFLAGS) -c $< -o $@
-
-.PRECIOUS: $(TARGET) $(OBJECTS)
+SOURCES := $(shell find $(SRCDIR) -type f -name *.$(SRCEXT))
+OBJECTS := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(SOURCES:.$(SRCEXT)=.o))
+HEADERS = $(wildcard $(SRCDIR)/*.h)
+INC := -I include
 
 $(TARGET): $(OBJECTS)
-	$(CC) $(OBJECTS) -Wall $(LIBS) -o $@
+	@echo " Linking..."
+	$(CC) $^ -o $(TARGET)
+
+$(BUILDDIR)/%.o: $(SRCDIR)/%.$(SRCEXT)
+	@mkdir -p $(BUILDDIR)
+	$(CC) $(CFLAGS) $(INC) -c -o $@ $<
 
 clean:
-	-rm -f *.o
-	-rm -f $(TARGET)
+	@echo " Cleaning...";
+	@echo " $(RM) -r $(BUILDDIR) $(TARGET)"; $(RM) -r $(BUILDDIR) $(TARGET)
 
+.PHONY: default all clean

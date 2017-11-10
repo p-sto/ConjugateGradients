@@ -17,13 +17,25 @@ Road-map:
                 - [ ] SSOR preconditioner
                 - [ ] Incomplete Cholesky factorization preconditioner
 
- -  [ ] C implementation
-        - [ ] Reference implementation using BLAS library (either ACML or OpenBLAS)
-        - [ ] Custom BLAS implementation using OpenMP
+ - [ ] C implementation
+        - [ ] Implement pure CG
+                - [ ] Implementation using BLAS library (Intel MKL*)
+                - [ ] Custom BLAS implementation using OpenMP
+        - [ ] Implement PCG
+                - [ ] Jacobi preconditioner
+                        - [ ] Implementation using BLAS library (Intel MKL*)
+                        - [ ] Custom BLAS implementation using OpenMP
 
  - [ ] CUDA implementation
-        - [ ] Reference implementation using CUBLAS
-        - [ ] Custom kernels implementation
+        - [ ] Implement pure CG
+                - [ ] Reference implementation using CUBLAS
+                - [ ] Custom kernels implementation
+        - [ ] Implement PCG
+                - [ ] Jacobi preconditioner
+                        - [ ] Reference implementation using CUBLAS
+                        - [ ] Custom kernels implementation
+
+ * MKL can be obtained free of charge: https://software.intel.com/en-us/mkl
 
 
 Getting Started
