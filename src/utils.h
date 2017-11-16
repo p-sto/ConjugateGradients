@@ -1,14 +1,16 @@
 /*Contains prototypes for miscellaneous functions.*/
 
+#include "mkl.h"
+
 #ifndef UTILS_H
 #define UTILS_H
 double get_time(void);
 
 typedef struct {
-	int size;
-	int non_zero;
-	int *I_column;
-	int *J_row;
+	MKL_INT size;
+	MKL_INT non_zero;
+	MKL_INT *I_column;
+	MKL_INT *J_row;
 	double *val;
 }Matrix;
 

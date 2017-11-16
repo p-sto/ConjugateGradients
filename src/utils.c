@@ -24,8 +24,8 @@ double get_time(){
 	struct timeval tp;
 	double sec, usec;
 	gettimeofday(&tp, 0);
-	sec    = (double)(tp.tv_sec);
-	usec   = (double)(tp.tv_usec)/1E6;
+	sec = (double)(tp.tv_sec);
+	usec = (double)(tp.tv_usec)/1E6;
 	return sec + usec;
 #endif
 }
@@ -36,7 +36,7 @@ Matrix* getMatrixCRS(InputConfig *input_cfg){
 	fil_name = input_cfg->filename;
 	if (fil_name == NULL)
 		return NULL;
-	FILE * pf;
+	FILE *pf;
 	pf = fopen(fil_name, "r");
 	if(pf == NULL){
 		printf("Can't open the file: %s", fil_name);
@@ -48,29 +48,30 @@ Matrix* getMatrixCRS(InputConfig *input_cfg){
 	int matsize, max_rows;
 
 	// Load first line of file with information about size and non zero element in matrix
-	fscanf(pf,"%d %d %d", &non_zero, &matsize, &max_rows);
+	fscanf(pf,"%d %d %d", &matsize, &non_zero, &max_rows);
 
 	matrix->size = matsize;
 	matrix->non_zero = non_zero;
-	matrix->I_column = (int *)mkl_malloc((matsize+1) * sizeof(int), 64);
-	matrix->J_row = (int *)mkl_malloc(non_zero * sizeof(int), 64 );
+	matrix->I_column = (MKL_INT *)mkl_malloc((matsize + 1) * sizeof(MKL_INT), 64);
+	matrix->J_row = (MKL_INT *)mkl_malloc(non_zero * sizeof(MKL_INT), 64 );
 	matrix->val = (double *)mkl_malloc(non_zero * sizeof(double), 64);
 
 	int n = 0;
-	while( ! feof (pf)){
-		if(n <= non_zero){
-			fscanf(pf,"%le %d %d",&v,&c,&inx);
+	while( ! feof(pf)){
+		if(n < matsize + 1){
+			fscanf(pf, "%le %d %d", &v, &c, &inx);
 			matrix->val[n] = v;
 			matrix->J_row[n] = c;
 			matrix->I_column[n] = inx;
 		}
 		else{
-			fscanf(pf,"%le %d",&v,&c);
+			fscanf(pf, "%le %d", &v, &c);
 			matrix->val[n] = v;
 			matrix->J_row[n] = c;
 		}
 		n++;
 	}
+	free(pf);
 	return matrix;
 }
 

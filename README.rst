@@ -19,7 +19,7 @@ Road-map:
 
  - [ ] C implementation
         - [ ] Implement pure CG
-                - [ ] Implementation using BLAS library (Intel MKL*)
+                - [X] Implementation using BLAS library (Intel MKL*)
                 - [ ] Custom BLAS implementation using OpenMP
         - [ ] Implement PCG
                 - [ ] Jacobi preconditioner
@@ -125,10 +125,39 @@ and positively defined.
         :scale: 50 %
 
 Examples can be found in ``scripts/ConjugateGradients/demo.py``
+Required Python 3.5+
 
 
 C implementation - TBA
 ----------------------
+
+MKL implementation
+~~~~~~~~~~~~~~~~~~
+
+Required - Intel MKL library for BLAS operations. Implementation was tested on version 2017 though older should work as well.
+By default MKL will be installed in directory ``/opt/intel/mkl/``.
+
+To compile:
+
+::
+
+    $ source mkl_setup.sh
+    $ make
+
+``mkl_setup.sh`` sources MKL env configuration.
+
+::
+
+    If you have installed MKL in a different directory, then you will have to adjust mkl_setup.sh
+    script to point to proper paths.
+    Also please note that in makefile there is MKLROOT variable which points to MKL installation directory.
+
+By default MKL will be compiled as a static library.
+Since there are many dependencies it is good to set ``CFLAGS`` and ``LDFLAGS`` accordingly to MKL link line advisor:
+
+https://software.intel.com/en-us/articles/intel-mkl-link-line-advisor
+
+Use ``make clean`` command to delete compiled build.
 
 CUDA implementation - TBA
 -------------------------

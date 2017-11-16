@@ -17,9 +17,10 @@ LIBRARY_DIRS := $(MKLROOT)/lib/intel64
 
 LFLAGS := $(foreach includedir,$(INCLUDE_DIRS),-I$(includedir))
 CFLAGS += $(foreach includedir,$(INCLUDE_DIRS),-I$(includedir))
+CFLAGS += -DMKL_ILP64 -m64 -I${MKLROOT}/include
 # static liking to MKL
 LDFLAGS := -Wl,--start-group $(LIBRARY_DIRS)/libmkl_intel_ilp64.a $(LIBRARY_DIRS)/libmkl_intel_thread.a $(LIBRARY_DIRS)/libmkl_core.a -Wl,--end-group
-LDFLAGS += -liomp5 -lpthread -lm -ldl -fPIC
+LDFLAGS +=  -liomp5 -lpthread -lm -ldl
 
 $(TARGET): $(OBJECTS)
 	@echo " Linking..."

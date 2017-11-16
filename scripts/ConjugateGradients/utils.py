@@ -24,12 +24,12 @@ class CSRMatrix:
     @property
     def rows_i(self) -> List:
         """Return list containing matrix rows indexes."""
-        return list(self._m_matrix.nonzero()[0])
+        return self._m_matrix.indptr
 
     @property
     def column_j(self) -> List:
         """Return list containing matrix columns indexes."""
-        return list(self._m_matrix.nonzero()[1])
+        return self._m_matrix.indices
 
     @property
     def values(self) -> List:
@@ -69,9 +69,16 @@ def save_csr_matrix_to_file(matrix: np.matrix, filename: str):
         raise TypeError('Sorry - only size x size matrices!')
     with open(filename, 'w+') as fil:
         # save line with number of elements, matrix size and rows number
-        fil.write('{} {} {}\n'.format(len(_matrix.values), _matrix.shape[0], len(_matrix.rows_i)))
-        for ind, elmn in enumerate(_matrix.rows_i):
-            if ind < _matrix.nnz:
-                fil.write('{} {} {}\n'.format(_matrix.values[ind], _matrix.column_j[ind], elmn))
-            else:
-                fil.write('{} {}\n'.format(_matrix.values[ind], _matrix.column_j[ind]))
+        fil.write('{} {} {}\n'.format(_matrix.shape[0], _matrix.nnz, len(_matrix.rows_i)))
+        if len(_matrix.rows_i) < len(_matrix.column_j):
+            for ind in range(len(_matrix.column_j)):
+                if ind < len(_matrix.rows_i):
+                    fil.write('{} {} {}\n'.format(_matrix.values[ind], _matrix.column_j[ind], _matrix.rows_i[ind]))
+                else:
+                    fil.write('{} {}\n'.format(_matrix.values[ind], _matrix.column_j[ind]))
+        else:
+            for ind in range(len(_matrix.rows_i)):
+                if ind < len(_matrix.column_j):
+                    fil.write('{} {} {}\n'.format(_matrix.values[ind], _matrix.column_j[ind], _matrix.rows_i[ind]))
+                else:
+                    fil.write('{} {} {}\n'.format('-', '-', _matrix.rows_i[ind]))
