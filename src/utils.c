@@ -72,6 +72,7 @@ Matrix* getMatrixCRS(InputConfig *input_cfg){
 		n++;
 	}
 	free(pf);
+	pf = NULL;
 	return matrix;
 }
 
