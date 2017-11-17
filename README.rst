@@ -23,7 +23,7 @@ Road-map:
                 - [ ] Custom BLAS implementation using OpenMP
         - [ ] Implement PCG
                 - [ ] Jacobi preconditioner
-                        - [ ] Implementation using BLAS library (Intel MKL*)
+                        - [X] Implementation using BLAS library (Intel MKL*)
                         - [ ] Custom BLAS implementation using OpenMP
 
  - [ ] CUDA implementation

@@ -42,7 +42,6 @@ Matrix* getMatrixCRS(InputConfig *input_cfg){
 		printf("Can't open the file: %s", fil_name);
 	}
 
-	Matrix *matrix = (Matrix *)malloc(sizeof(Matrix));
 	double v;
 	int c, non_zero, inx;
 	int matsize, max_rows;
@@ -50,6 +49,7 @@ Matrix* getMatrixCRS(InputConfig *input_cfg){
 	// Load first line of file with information about size and non zero element in matrix
 	fscanf(pf,"%d %d %d", &matsize, &non_zero, &max_rows);
 
+	Matrix *matrix = (Matrix *)malloc(sizeof(Matrix));
 	matrix->size = matsize;
 	matrix->non_zero = non_zero;
 	matrix->I_column = (MKL_INT *)mkl_malloc((matsize + 1) * sizeof(MKL_INT), 64);
@@ -71,7 +71,7 @@ Matrix* getMatrixCRS(InputConfig *input_cfg){
 		}
 		n++;
 	}
-	free(pf);
+	fclose(pf);
 	pf = NULL;
 	return matrix;
 }
@@ -81,6 +81,7 @@ InputConfig* arg_parser(int argc, char **argv){
 	InputConfig *input_cfg = (InputConfig *)malloc(sizeof(InputConfig));
 	input_cfg->num_of_threads = 1;
 	input_cfg->filename = NULL;
+	input_cfg->preconditioner = NULL;
 
 	int mt = 0;
 	int fil_flag = 0;
@@ -95,6 +96,8 @@ InputConfig* arg_parser(int argc, char **argv){
 			fil_flag = 0;
 		if (strcmp(argv[i], "-i") == 0)
 			fil_flag = 1;
+		if (strcmp(argv[i], "--pcg_jacobi") == 0)
+			input_cfg->preconditioner = "jacobi";
 	}
 	return input_cfg;
 }

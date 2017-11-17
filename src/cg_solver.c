@@ -9,7 +9,8 @@
 #include "cg_solver.h"
 #include "mkl.h"
 
-#define FREE_STACK mkl_free(Ax);\
+#define FREE_STACK \
+	mkl_free(Ax);\
 	mkl_free(q);\
 	mkl_free(x);\
 	mkl_free(d)

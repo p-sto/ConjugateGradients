@@ -17,6 +17,7 @@ typedef struct {
 typedef struct{
 	char *filename;
 	int num_of_threads;
+	char *preconditioner;
 } InputConfig;
 
 Matrix* getMatrixCRS(InputConfig *input_cfg);

@@ -5,10 +5,12 @@
  *
  * */
 
-#define FREE_STACK_COMMON free(matrix);\
+#define FREE_STACK_COMMON \
+	free(matrix);\
 	free(input_cfg);\
 
-#define FREE_STACK_ALL FREE_STACK_COMMON\
+#define FREE_STACK_ALL \
+	FREE_STACK_COMMON\
 	mkl_free(res_vec);\
 	mkl_free(b_vec);\
 	mkl_free(x_vec)
@@ -18,6 +20,7 @@
 #include "stdio.h"
 #include "utils.h"
 #include "cg_solver.h"
+#include "pcg_solver.h"
 #include "mkl.h"
 
 
@@ -40,7 +43,6 @@ int main(int argc, char** argv){
 
 	double *x_vec, *b_vec, *res_vec;
 	double t_start, t_stop;
-
 	x_vec = (double *)mkl_malloc(matrix->size * sizeof(double), 64);
 	b_vec = (double *)mkl_malloc(matrix->size * sizeof(double), 64);
 	res_vec = (double *)mkl_malloc(matrix->size * sizeof(double), 64);
@@ -52,10 +54,16 @@ int main(int argc, char** argv){
 	}
 
 	t_start = get_time();
-	total_iter = conjugate_gradient_solver(matrix, x_vec, b_vec, res_vec);
+	if (input_cfg->preconditioner == NULL){
+		printf("Launching CG\n.");
+		total_iter = conjugate_gradient_solver(matrix, x_vec, b_vec, res_vec);
+	} else {
+		printf("Launching PCG with %s preconditioner\n.", input_cfg->preconditioner);
+		total_iter = pcg_solver(matrix, x_vec, b_vec, res_vec, input_cfg->preconditioner);
+	}
 	t_stop = get_time();
 	printf("Conjugate gradient method finished within %.3f [secs] in total %d iterations.\n", t_stop - t_start, total_iter);
 
 	FREE_STACK_ALL;
-	return 0;
+	exit(0);
 }
