@@ -1,14 +1,31 @@
 CC := gcc
-CFLAGS := -Wall -Werror -Wmissing-prototypes -std=c11 -O2
-TARGET = ConjugateGradient
 SRCEXT := c
 HEADEREXT := h
+CFLAGS := -Wall -Werror -Wmissing-prototypes -std=c11 -O2
+
+NVCC := /usr/local/cuda/bin/nvcc
+CUDAFLAGS :=
+CUDALIBPATH := /usr/local/cuda/lib64
+NVSRCEXT := cu
+NVHEADEREXT := h
+
+TARGET = ConjugateGradient
 SRCDIR := src
 BUILDDIR := build
+
 SOURCES := $(shell find $(SRCDIR) -type f -name *.$(SRCEXT))
-OBJECTS := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(SOURCES:.$(SRCEXT)=.o))
 HEADERS = $(wildcard $(SRCDIR)/*.$(HEADEREXT))
-INC := -I include
+OBJECTS := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(SOURCES:.$(SRCEXT)=.o))
+
+CUDASOURCES := $(shell find $(SRCDIR) -type f -name *.$(NVSRCEXT))
+CUDAHEADERS := $(wildcard $(SRCDIR)/*.$(NVHEADEREXT))
+CUDAOBJECTS := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(CUDASOURCES:.$(NVSRCEXT)=.o))
+
+SOURCES += $(CUDASOURCES)
+HEADERS += $(CUDAHEADERS)
+OBJECTS += $(CUDAOBJECTS)
+
+INC := -I include -I/usr/local/cuda/include
 
 # MKL setting
 MKLROOT := /opt/intel/mkl
@@ -22,9 +39,15 @@ CFLAGS += -DMKL_ILP64 -m64 -I${MKLROOT}/include
 LDFLAGS := -Wl,--start-group $(LIBRARY_DIRS)/libmkl_intel_ilp64.a $(LIBRARY_DIRS)/libmkl_intel_thread.a $(LIBRARY_DIRS)/libmkl_core.a -Wl,--end-group
 LDFLAGS +=  -liomp5 -lpthread -lm -ldl
 
+# add cuda flags
+LDFLAGS += -L$(CUDALIBPATH) -lcuda -lcudart -lcublas -lcusparse
+
 $(TARGET): $(OBJECTS)
 	@echo " Linking..."
 	$(CC) $^ -o $(TARGET) $(LFLAGS) $(LDFLAGS)
+
+$(BUILDDIR)/%.o: $(SRCDIR)/%.$(NVSRCEXT)
+	$(NVCC) $(CUDAFLAGS) -c -o $@ $<
 
 $(BUILDDIR)/%.o: $(SRCDIR)/%.$(SRCEXT)
 	@mkdir -p $(BUILDDIR)

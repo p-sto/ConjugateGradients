@@ -8,9 +8,13 @@
 
 #include <string.h>
 #include <stdio.h>
+#include "cg_solver.h"
+#include "pcg_solver.h"
 #include "utils.h"
 #include "mkl.h"
-
+#include "gpu_utils.h"
+#include "cg_colver_gpu.h"
+#include <cuda_runtime.h>
 
 double get_time(){
 	/* Return ``double`` time stamp for execution time measurements. Implementation depends on OS. */
@@ -80,6 +84,7 @@ InputConfig* arg_parser(int argc, char **argv){
 	/*Parse argument line*/
 	InputConfig *input_cfg = (InputConfig *)malloc(sizeof(InputConfig));
 	input_cfg->num_of_threads = 1;
+	input_cfg->gpu = 0;
 	input_cfg->filename = NULL;
 	input_cfg->preconditioner = NULL;
 
@@ -98,6 +103,32 @@ InputConfig* arg_parser(int argc, char **argv){
 			fil_flag = 1;
 		if (strcmp(argv[i], "--pcg_jacobi") == 0)
 			input_cfg->preconditioner = "jacobi";
+		if (strcmp(argv[i], "--gpu") == 0)
+			input_cfg->gpu = 1;
 	}
 	return input_cfg;
+}
+
+int launch_solver(Matrix *matrix, double *x_vec, double *b_vec, double *res_vec, InputConfig *input_cfg){
+	/*Launch proper solver based on input config data.*/
+	GPU_data *gpu_data;
+	gpu_data = get_gpu_devices_data();
+
+	int total_iter = 0;
+	printf("Number of CUDA devices: %d\n", gpu_data->devices_number);
+	if (gpu_data->devices_number > 0 && input_cfg->gpu == 1){
+		printf("Launching GPU CG\n.");
+		cudaDeviceReset();
+		total_iter = gpu_conjugate_gradient_solver(matrix, x_vec, b_vec, res_vec);
+	} else {
+		if (input_cfg->preconditioner == NULL){
+			printf("Launching CPU CG\n.");
+			total_iter = conjugate_gradient_solver(matrix, x_vec, b_vec, res_vec);
+		} else {
+			printf("Launching CPU PCG with %s preconditioner\n.", input_cfg->preconditioner);
+			total_iter = pcg_solver(matrix, x_vec, b_vec, res_vec, input_cfg->preconditioner);
+		}
+	}
+	free(gpu_data);
+	return total_iter;
 }
