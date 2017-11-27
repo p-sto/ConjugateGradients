@@ -2,11 +2,13 @@
 
 
 #include "cg_colver_gpu.h"
+#include "ckernels.h"
 
 extern "C"
 {
 #include "gpu_utils.h"
 #include "utils.h"
+
 #include <cuda_runtime.h>
 #include <cusparse_v2.h>
 #include <cublas_v2.h>
@@ -32,23 +34,6 @@ extern "C"
 	cudaFree(d_dot_zero);\
 	cudaFree(d_dot_old);\
 	cudaFree(d_dTq);
-
-
-__global__ void divide(double *res, double *divided, double *divider) {
-	/*Division of double elements on single thread*/
-	if (threadIdx.x == 0) {
-		res[0] = divided[0] / divider[0];
-	}
-}
-
-__global__ void axpy(int num_elements, double alpha, double *x, double *y) {
-	/*Perform computations of axpy operations - y[i] = y[i] + alpha * x[i]*/
-	unsigned int i = blockDim.x * blockIdx.x + threadIdx.x;
-
-	if (i < num_elements) {
-		y[i] = y[i] + alpha * x[i];
-	}
-}
 
 
 int gpu_conjugate_gradient_solver(Matrix *matrix, double *x_vec, double *rhs, double *res_vec, GPU_data gpu_data){
@@ -129,7 +114,7 @@ int gpu_conjugate_gradient_solver(Matrix *matrix, double *x_vec, double *rhs, do
 						  &alpha, descr, d_val, d_J, d_I, d_x, &beta, d_Ax);
 		/*Calculate alpha:*/
 		cublasDdot(cublasHandle, matrix->size, d_d, 1, d_q, 1, d_dTq);
-		divide<<<1, gpu_data.devices[0].warp_size>>>(d_alfa, d_dot, d_dTq);
+		sDdiv<<<1, gpu_data.devices[0].warp_size>>>(d_alfa, d_dot, d_dTq);
 		/*Calculate x=x+alpha*d*/
 		cublasDaxpy(cublasHandle, matrix->size, d_alfa, d_x, 1, d_d, 1);
 		/*Calculate r=r-alpha*q*/
@@ -138,7 +123,7 @@ int gpu_conjugate_gradient_solver(Matrix *matrix, double *x_vec, double *rhs, do
 		cublasDcopy(cublasHandle, 1, d_dot_old, 1, d_dot, 1);
 		/*CG:Assign dot_new = r'*r*/
 		cublasDdot(cublasHandle, matrix->size, d_rhs, 1, d_rhs, 1, d_dot);
-		divide<<<1, gpu_data.devices[0].warp_size>>>(d_beta, d_dot, d_dot_old);
+		sDdiv<<<1, gpu_data.devices[0].warp_size>>>(d_beta, d_dot, d_dot_old);
 		/*Scale beta*d*/
 		cublasDscal(cublasHandle, matrix->size, d_beta, d_d, 1);
 		/*CG:Calculate d=r+beta*d*/
