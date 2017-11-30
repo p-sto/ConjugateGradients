@@ -1,5 +1,7 @@
 /*Contains prototypes of gpu_utils functions and structs.*/
 
+#ifndef GPU_UTILS_H
+#define GPU_UTILS_H
 typedef struct {
 	char *name;
 	int warp_size;
@@ -17,3 +19,5 @@ typedef struct {
 } GPU_data;
 
 GPU_data *get_gpu_devices_data();
+
+#endif

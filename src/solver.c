@@ -50,7 +50,6 @@ int main(int argc, char** argv){
 		b_vec[i] = 0;
 		res_vec[i] = 0;
 	}
-
 	t_start = get_time();
 	total_iter = launch_solver(matrix, x_vec, b_vec, res_vec, input_cfg);
 	t_stop = get_time();

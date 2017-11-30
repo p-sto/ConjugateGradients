@@ -115,17 +115,17 @@ int launch_solver(Matrix *matrix, double *x_vec, double *b_vec, double *res_vec,
 	gpu_data = get_gpu_devices_data();
 
 	int total_iter = 0;
-	printf("Number of CUDA devices: %d\n", gpu_data->devices_number);
 	if (gpu_data->devices_number > 0 && input_cfg->gpu == 1){
-		printf("Launching GPU CG\n.");
+		printf("Launching GPU CG.\n");
+		printf("Number of CUDA devices: %d\n", gpu_data->devices_number);
 		cudaDeviceReset();
-		total_iter = gpu_conjugate_gradient_solver(matrix, x_vec, b_vec, res_vec);
+		total_iter = gpu_conjugate_gradient_solver(matrix, x_vec, b_vec, res_vec, gpu_data);
 	} else {
 		if (input_cfg->preconditioner == NULL){
-			printf("Launching CPU CG\n.");
+			printf("Launching CPU CG.\n");
 			total_iter = conjugate_gradient_solver(matrix, x_vec, b_vec, res_vec);
 		} else {
-			printf("Launching CPU PCG with %s preconditioner\n.", input_cfg->preconditioner);
+			printf("Launching CPU PCG with %s preconditioner.\n", input_cfg->preconditioner);
 			total_iter = pcg_solver(matrix, x_vec, b_vec, res_vec, input_cfg->preconditioner);
 		}
 	}

@@ -40,11 +40,12 @@ LDFLAGS := -Wl,--start-group $(LIBRARY_DIRS)/libmkl_intel_ilp64.a $(LIBRARY_DIRS
 LDFLAGS +=  -liomp5 -lpthread -lm -ldl
 
 # add cuda flags
-LDFLAGS += -L$(CUDALIBPATH) -lcuda -lcudart -lcublas -lcusparse
+# -DMKL_ILP64 sets int to 64, has to be added to both gcc and nvcc
+CUDAFLAGS := -L$(CUDALIBPATH) -lcuda -lcudart -lcublas -lcusparse -m64 -DMKL_ILP64
 
 $(TARGET): $(OBJECTS)
 	@echo " Linking..."
-	$(CC) $^ -o $(TARGET) $(LFLAGS) $(LDFLAGS)
+	$(CC) $^ -o $(TARGET) $(LFLAGS) $(LDFLAGS) $(CUDAFLAGS)
 
 $(BUILDDIR)/%.o: $(SRCDIR)/%.$(NVSRCEXT)
 	$(NVCC) $(CUDAFLAGS) -c -o $@ $<
@@ -59,5 +60,8 @@ valgrind:
 clean:
 	@echo " Cleaning...";
 	@echo " $(RM) -r $(BUILDDIR) $(TARGET)"; $(RM) -r $(BUILDDIR) $(TARGET)
+
+cuda_info:
+	nvidia-smi -a
 
 .PHONY: default all clean

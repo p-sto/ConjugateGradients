@@ -1,5 +1,7 @@
 /*Contains implementation of gpu_utils functions and structs.*/
 
+#include <stdio.h>
+
 extern "C" {
 #include <cuda_runtime.h>
 #include "gpu_utils.h"
@@ -10,7 +12,11 @@ GPU_data *get_gpu_devices_data(){
 	GPU_data *gpu_data;
 	gpu_data = (GPU_data *)malloc(sizeof(GPU_data));
 	gpu_data->devices_number = 0;
-	cudaGetDeviceCount(&gpu_data->devices_number);
+	cudaError_t device_error;
+	device_error = cudaGetDeviceCount(&gpu_data->devices_number);
+	if (device_error != cudaSuccess)
+		printf("Error - could not read properly number of device, err=[%s] \n", cudaGetErrorString(device_error));
+
 	if (gpu_data->devices_number != 0){
 		gpu_data->devices = (GPU_device *)malloc(gpu_data->devices_number * sizeof(GPU_device));
 		for (int i = 0; i < gpu_data->devices_number; i ++){
