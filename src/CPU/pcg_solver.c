@@ -9,6 +9,7 @@
 #include <stdlib.h>
 #include "pcg_solver.h"
 #include "mkl.h"
+#include "../misc/logger.h"
 
 #define FREE_STACK mkl_free(Ax);\
 	mkl_free(q);\
@@ -52,7 +53,7 @@ double* perform_preconditioning(Matrix *matrix, double *vec, pc_cfg *pc_config){
 			res[i] = vec[i] * pc_config->inverted_diagonal[i];
 		}
 	} else {
-		printf("No such preconditioner: %s, exiting", pc_config->preconditioner);
+		logger(LEVEL_ERROR, "No such preconditioner: %s, exiting", pc_config->preconditioner);
 		exit(1);
 	}
 	return res;

@@ -1,6 +1,6 @@
 /* Header file for Preconditioned Conjugate Gradient method */
 
-#include "utils.h"
+#include "../misc/utils.h"
 
 typedef struct {
 	char *preconditioner;
