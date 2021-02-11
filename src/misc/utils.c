@@ -8,13 +8,14 @@
 
 #include <string.h>
 #include <stdio.h>
-#include "cg_solver.h"
-#include "pcg_solver.h"
+#include "../CPU/cg_solver.h"
+#include "../CPU/pcg_solver.h"
 #include "utils.h"
 #include "mkl.h"
-#include "gpu_utils.h"
-#include "cg_colver_gpu.h"
+#include "../GPU/gpu_utils.h"
+#include "../GPU/cg_solver_gpu.h"
 #include <cuda_runtime.h>
+#include "logger.h"
 
 double get_time(){
 	/* Return ``double`` time stamp for execution time measurements. Implementation depends on OS. */
@@ -43,7 +44,7 @@ Matrix* getMatrixCRS(InputConfig *input_cfg){
 	FILE *pf;
 	pf = fopen(fil_name, "r");
 	if(pf == NULL){
-		printf("Can't open the file: %s", fil_name);
+		logger(LEVEL_ERROR, "Can't open the file: %s", fil_name);
 	}
 
 	double v;
@@ -57,7 +58,7 @@ Matrix* getMatrixCRS(InputConfig *input_cfg){
 	matrix->size = matsize;
 	matrix->non_zero = non_zero;
 	matrix->I_column = (MKL_INT *)mkl_malloc((matsize + 1) * sizeof(MKL_INT), 64);
-	matrix->J_row = (MKL_INT *)mkl_malloc(non_zero * sizeof(MKL_INT), 64 );
+	matrix->J_row = (MKL_INT *)mkl_malloc(non_zero * sizeof(MKL_INT), 64);
 	matrix->val = (double *)mkl_malloc(non_zero * sizeof(double), 64);
 
 	int n = 0;
@@ -78,6 +79,52 @@ Matrix* getMatrixCRS(InputConfig *input_cfg){
 	fclose(pf);
 	pf = NULL;
 	return matrix;
+}
+
+MatrixInt* getMatrixCRSInt(InputConfig *input_cfg){
+    /* Load Matrix stored in CSR format from file.*/
+    char *fil_name;
+    fil_name = input_cfg->filename;
+    if (fil_name == NULL)
+        return NULL;
+    FILE *pf;
+    pf = fopen(fil_name, "r");
+    if(pf == NULL){
+        logger(LEVEL_ERROR, "Can't open the file: %s", fil_name);
+    }
+
+    double v;
+    int c, non_zero, inx;
+    int matsize, max_rows;
+
+    // Load first line of file with information about size and non zero element in matrix
+    fscanf(pf,"%d %d %d", &matsize, &non_zero, &max_rows);
+
+    MatrixInt *matrix = (MatrixInt *)malloc(sizeof(MatrixInt));
+    matrix->size = matsize;
+    matrix->non_zero = non_zero;
+    matrix->I_column = (int *)malloc((matsize + 1) * sizeof(int));
+    matrix->J_row = (int *)malloc(non_zero * sizeof(int));
+    matrix->val = (double *)malloc(non_zero * sizeof(double));
+
+    int n = 0;
+    while( ! feof(pf)){
+        if(n < matsize + 1){
+            fscanf(pf, "%le %d %d", &v, &c, &inx);
+            matrix->val[n] = v;
+            matrix->J_row[n] = c;
+            matrix->I_column[n] = inx;
+        }
+        else{
+            fscanf(pf, "%le %d", &v, &c);
+            matrix->val[n] = v;
+            matrix->J_row[n] = c;
+        }
+        n++;
+    }
+    fclose(pf);
+    pf = NULL;
+    return matrix;
 }
 
 InputConfig* arg_parser(int argc, char **argv){
@@ -109,24 +156,24 @@ InputConfig* arg_parser(int argc, char **argv){
 	return input_cfg;
 }
 
-int launch_solver(Matrix *matrix, double *x_vec, double *b_vec, double *res_vec, InputConfig *input_cfg){
+int launch_solver(MatrixInt *matrix, double *x_vec, double *b_vec, double *res_vec, InputConfig *input_cfg){
 	/*Launch proper solver based on input config data.*/
 	GPU_data *gpu_data;
 	gpu_data = get_gpu_devices_data();
 
 	int total_iter = 0;
 	if (gpu_data->devices_number > 0 && input_cfg->gpu == 1){
-		printf("Launching GPU CG.\n");
-		printf("Number of CUDA devices: %d\n", gpu_data->devices_number);
+		logger(LEVEL_INFO, "%s", "Launching GPU CG.");
+		logger(LEVEL_INFO, "Number of CUDA devices: %d", gpu_data->devices_number);
 		cudaDeviceReset();
 		total_iter = gpu_conjugate_gradient_solver(matrix, x_vec, b_vec, res_vec, gpu_data);
 	} else {
 		if (input_cfg->preconditioner == NULL){
-			printf("Launching CPU CG.\n");
-			total_iter = conjugate_gradient_solver(matrix, x_vec, b_vec, res_vec);
+			logger(LEVEL_INFO, "%s", "Launching CPU CG.");
+			//total_iter = conjugate_gradient_solver(matrix, x_vec, b_vec, res_vec);
 		} else {
-			printf("Launching CPU PCG with %s preconditioner.\n", input_cfg->preconditioner);
-			total_iter = pcg_solver(matrix, x_vec, b_vec, res_vec, input_cfg->preconditioner);
+			logger(LEVEL_INFO, "Launching CPU PCG with %s preconditioner.", input_cfg->preconditioner);
+			//total_iter = pcg_solver(matrix, x_vec, b_vec, res_vec, input_cfg->preconditioner);
 		}
 	}
 	free(gpu_data);

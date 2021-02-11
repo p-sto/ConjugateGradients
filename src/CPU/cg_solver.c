@@ -8,6 +8,8 @@
 #include <stdlib.h>
 #include "cg_solver.h"
 #include "mkl.h"
+#include "../misc/logger.h"
+#include "../misc/math_functions.h"
 
 #define FREE_STACK \
 	mkl_free(Ax);\
@@ -22,7 +24,7 @@ int conjugate_gradient_solver(Matrix *matrix, double *x_vec, double *rhs, double
 	 * */
 
 	int k, max_iter;
-	double beta, tol, alpha, dTq, dot_zero, dot_new, dot_old;
+	double beta, tol, alpha, dTq, dot_zero, dot_new, dot_old, norm;
 	double *Ax, *x, *d, *q;
 	k = 0;
 	beta = 0.0;
@@ -33,21 +35,23 @@ int conjugate_gradient_solver(Matrix *matrix, double *x_vec, double *rhs, double
 	x = (double *)mkl_malloc(matrix->size * sizeof(double), 64);
 	q = (double *)mkl_malloc(matrix->size * sizeof(double), 64);
 	Ax = (double *)mkl_malloc(matrix->size * sizeof(double), 64);
-
 	/*Calculate Ax matrix*/
 	mkl_cspblas_dcsrgemv("N", &(matrix->size), matrix->val, matrix->I_column, matrix->J_row, x_vec, Ax);
+	norm = euclidean_norm(matrix->size, Ax); logger(LEVEL_DEBUG, "x_vec norm value: %f", norm);
 	/*Calculate rhs=rhs-Ax matrix*/
 	cblas_daxpy(matrix->size, -1.0, Ax, 1 , rhs, 1);
 	/*CG: Copy updated rhs (residuum) to d vector*/
 	cblas_dcopy(matrix->size, rhs, 1, d, 1);
+    norm = euclidean_norm(sizeof(double), d); logger(LEVEL_DEBUG, "d norm value: %f", norm);
 	/*CG: calculate dot r'*r, assign it to dot_new */
 	dot_new = cblas_ddot(matrix->size, rhs, 1 ,rhs, 1);
+    norm = euclidean_norm(sizeof(double), &dot_new); logger(LEVEL_DEBUG, "dot_new norm value: %f", dot_new);
 	/*assign dot_new to dot_zero*/
 	dot_zero = dot_new;
 	while (dot_new >  tol * tol * dot_zero && k < max_iter) {
 		/*Calculate q=A*d vector*/
 		mkl_cspblas_dcsrgemv("N", &(matrix->size), matrix->val, matrix->I_column, matrix->J_row, d, q);
-		/*Calculate alpha:*/
+		/*Calculate alpha = dot_new/dTq */
 		dTq = cblas_ddot(matrix->size, d, 1, q, 1);
 		alpha = dot_new / dTq;
 		/*Calculate x=x+alpha*d*/
@@ -58,6 +62,7 @@ int conjugate_gradient_solver(Matrix *matrix, double *x_vec, double *rhs, double
 		dot_old = dot_new;
 		/*CG:Assign dot_new = r'*r*/
 		dot_new = cblas_ddot(matrix->size, rhs, 1, rhs, 1);
+		/* beta = d_new/d_old */
 		beta = dot_new / dot_old;
 		/*Scale beta*d*/
 		cblas_dscal(matrix->size, beta, d, 1);

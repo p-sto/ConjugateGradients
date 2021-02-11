@@ -5,6 +5,7 @@
 extern "C" {
 #include <cuda_runtime.h>
 #include "gpu_utils.h"
+#include "../misc/logger.h"
 }
 
 GPU_data *get_gpu_devices_data(){
@@ -15,14 +16,13 @@ GPU_data *get_gpu_devices_data(){
 	cudaError_t device_error;
 	device_error = cudaGetDeviceCount(&gpu_data->devices_number);
 	if (device_error != cudaSuccess)
-		printf("Error - could not read properly number of device, err=[%s] \n", cudaGetErrorString(device_error));
+		logger(LEVEL_WARNING, "Could not read properly number of devices, err=%s", cudaGetErrorString(device_error))
 
 	if (gpu_data->devices_number != 0){
 		gpu_data->devices = (GPU_device *)malloc(gpu_data->devices_number * sizeof(GPU_device));
 		for (int i = 0; i < gpu_data->devices_number; i ++){
 			cudaDeviceProp devProp;
 			cudaGetDeviceProperties(&devProp, i);
-
 			gpu_data->devices[i].name = devProp.name;
 			gpu_data->devices[i].warp_size = devProp.warpSize;
 			gpu_data->devices[i].max_threads_per_block = devProp.maxThreadsPerBlock;
